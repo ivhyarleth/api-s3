@@ -16,9 +16,14 @@ def build_response(status_code, body):
 
 def lambda_handler(event, context):
     try:
-        # event llega como {"bucket": "...", "directorio": "..."}
-        bucket = event.get("bucket")
-        directorio = event.get("directorio")
+        body = event.get("body")
+        if isinstance(body, str):
+            body = json.loads(body)
+        elif body is None:
+            body = {}
+
+        bucket = body.get("bucket")
+        directorio = body.get("directorio")
 
         if not bucket or not directorio:
             return build_response(400, {
