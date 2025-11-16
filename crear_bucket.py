@@ -17,9 +17,16 @@ def build_response(status_code, body):
 
 def lambda_handler(event, context):
     try:
-        # En este labo, API Gateway manda el JSON directo como event
-        # Ej: event = {"bucket": "arleth-s11-dev-bucket"}
-        bucket_name = event.get("bucket")
+        # En este taller, el cuerpo viene en event["body"]
+        body = event.get("body")
+
+        # Puede venir como string JSON o como dict, manejamos ambos casos
+        if isinstance(body, str):
+            body = json.loads(body)
+        elif body is None:
+            body = {}
+
+        bucket_name = body.get("bucket")
 
         if not bucket_name:
             return build_response(400, {
@@ -28,7 +35,6 @@ def lambda_handler(event, context):
 
         region = os.environ.get("AWS_REGION", "us-east-1")
 
-        # Caso especial para us-east-1
         if region == "us-east-1":
             s3.create_bucket(Bucket=bucket_name)
         else:
