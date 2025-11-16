@@ -16,17 +16,15 @@ def build_response(status_code, body):
 
 def lambda_handler(event, context):
     try:
-        body = json.loads(event.get("body") or "{}")
-
-        bucket = body.get("bucket")
-        directorio = body.get("directorio")
+        # event llega como {"bucket": "...", "directorio": "..."}
+        bucket = event.get("bucket")
+        directorio = event.get("directorio")
 
         if not bucket or not directorio:
             return build_response(400, {
                 "message": "Faltan campos 'bucket' y/o 'directorio'"
             })
 
-        # En S3 una "carpeta" es un objeto con key que termina en "/"
         if not directorio.endswith("/"):
             directorio = directorio + "/"
 
